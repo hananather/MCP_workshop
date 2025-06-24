@@ -1,59 +1,14 @@
 # Model Context Protocol
 
 The Model Context Protocol is an open source protocol that standardizes how applications provide context to LLMs.
-
-```mermaid
-
----
-
-config:
-
-theme: neutral
-
-look: classic
-
-layout: dagre
-
----
-
-flowchart LR
-
-subgraph Computer["Your Computer"]
-
-Client["Host with MCP Client<br>(Claude, IDEs, Tools)"]
-
-ServerA["MCP Server A"]
-
-ServerB["MCP Server B"]
-
-ServerC["MCP Server C"]
-
-DataA[("Local<br>Data Source A")]
-
-DataB[("Local<br>Data Source B")]
-
-end
-
-subgraph Internet["Internet"]
-
-RemoteC[("Remote<br>Service C")]
-
-end
-
-Client -- MCP Protocol --> ServerA & ServerB & ServerC
-
-ServerA <--> DataA
-
-ServerB <--> DataB
-
-ServerC -- Web APIs --> RemoteC
-
-```
+The motivation behind MCP is that models are only as good as the context we provide. This seems obvious now, but a year ago, when most AI applications were chatbots, you’d bring in context by copy-pasting or typing from other systems. Over the past year, we’ve seen these evolve into systems where the model has hooks into data and context, making it more powerful and personalized.
 
 
-It lets us build servers that expose data and functionalaity to LLM applications. Its often described as the “a USB-C port for AI applicaitons”, providing a uniform way to connect LLMs to resources they can use.
+![alt text](/diagrams/mcp-1.png)
 
-Just as USB-C port provides a standardized way to connect your devices to various perpherials and accessoris, MCP provides a standardized way to connect to AI models to differnt data sources and tools.
+MCP lets us build servers that expose data and functionality to LLM applications. Its often described as the “a USB-C port for AI applicaitons”, providing a uniform way to connect LLMs to resources they can use.
+
+Just as USB-C port provides a standardized way to connect your devices to various peripherals and accessories, MCP provides a standardized way to connect to AI models to different data sources and tools.
 
 It may be easier to think of it as an API, but specifically designed for LLM interactions.  MCP servers can:
 
@@ -62,6 +17,9 @@ It may be easier to think of it as an API, but specifically designed for LLM int
   - We can define interaction patterns through `Prompts` (resuable templates for LLM interactions)
 
 ---
+
+
+
 
 ### Introductory Example
 
@@ -129,10 +87,36 @@ asyncio.run(call_tool("Hanan"))
                              'stdio'                                   
 [TextContent(type='text', text='Hello, Hanan!', annotations=None)]
 ```
+A few key points:
+- clients are asynchronous, so we need to use `asyncio.run`  to run the client
+- we must enter a client context ( `async with client:` ) before using the client. We can make multiple client calls within the same context. 
+
+> **Context Manager**
+A context manager in Python is a pattern that ensures proper setup and clean up of resources. The `async with` statement is the asynchronous version of this pattern. 
+
+**Do We Need **`async with client:`**?**
+The FastMCP client needs to **establish a connection** to the server before it can make any requests. The `async with` statement handles this connection lifecycle automatically:
+``` python
+client = Client(mcp)
+
+# When you enter the context:
+async with client:
+    # 1. Connection is established here
+    # 2. MCP protocol handshake occurs
+    # 3. Client is now ready to make requests
+    
+    result = await client.call_tool("greet", {"name": "Ford"})
+    # You can make multiple calls here
+    
+# 4. Connection is automatically closed when exiting the context
+```
+
+
+
 
 
 ### Key Takeaways:
-- We have successfully equipped your LLM with a new capability (a greeting tool.)
+- We have successfully equipped our LLM with a new capability (a greeting tool.)
 This demonstrates the fundamental power of MCP: **turning any function into a tool that an LLM can use.**
 
 - The Three-Step Pattern:
@@ -148,14 +132,17 @@ This simple example demonstrates that MCP isn't just about connecting to externa
 
 ---
 
-### Motivation
 
-Models are only as good as the context provided to them. You can have an incredibly intelligent model at the frontier, but if it doesn't have the ability to connect to the outside world and pull in necessary data and context, it's not as useful as it can possibly be.
+Since models are only as good as the context provided to them. You can have an incredibly intelligent model at the frontier, but if it doesn't have the ability to connect to the outside world and pull in necessary data and context, it's not as useful as it can possibly be.
 
 MCP helps build agents and complex workflows on top of LLMs. LLMs frequently need to intergrate with data and tools, and MCP provides:
 - Pre-buillt intergrations that our LLM/AI application can plug into
 - Flexibility swtich between differnt LLM providers and AI applications
 - Best practices for securing your data within your infrastructure
+
+
+
+
 
 ### General Architecture
 
@@ -166,12 +153,13 @@ MCP helps build agents and complex workflows on top of LLMs. LLMs frequently nee
 - Local data sources like your computers’s files, databases, and servinces that MCP servers can securely access
 - Remote services are exteral systems availble over the internet (e.g., through APIs) that MCP servers can connect
 
+
 Everything that can be done with MCP can technically be done without it. MCP doesn't reinvent the wheel for things like tool use. It just aims to standardize how AI applications interact with external systems. This is why other AI competitors to Anthropic like OpenAI and Google have adopted MCP. An analogy I would use is it's like how web applications communicate with backends and other systems using REST, where you have a specified protocol, statelessness, and so on. MCP standardizes how AI applications interact with external systems. Instead of building the same integration for different data sources over and over again depending on the model or the data source, you build once and use everywhere.
 
 MCP shifts the burden and separates concerns cleanly. Build an MCP app and connect it to servers for whatever data you need. Want data from AWS? There's a server. Need Git access? There's a server. The goal is simple: use natural language to talk to data stores without writing all that logic.
 
 The beauty is that these servers are reusable. An MCP server for Google Drive works with any MCP app you build. AI assistant, agent, desktop app. If it speaks MCP, it can use that server. Let your imagination run with all the data access you can bring to your application with minimal code.
-
+![alt text](/diagrams/mcp-3.png)
 **Who wins with MCP?**
 - App developers: Connect with minimal code
 - API developers: Build once, adopt everywhere
@@ -191,7 +179,7 @@ You might be thinking MCP servers are just like APIs. You're not wrong. An analo
 MCP servers support tool use, but that's just one part. MCP servers provide tool plus schema + functions already defined for you. We will explore this in detail in the rest of this post.
 
 The main takeaways for now is: Why use MCP? Because it works with minimal effort.
-
+![alt text](/diagrams/mcp-2.png)
 ---
 
 ## How can you create an MCP server?
@@ -215,6 +203,8 @@ Tools are the core building blocks that allow our LLM to interact with external 
 2. FastMCP validates these parameters against your function’s signature.
 3. Our function executes with the validated inputs.
 4. The result is returned to the LLM, which can use it in its response.
+
+![alt text](/diagrams/FunctionCalling.png)
 
 This allows LLMs to perform tasks like querying databases, calling APIs, making calculations, or accessing files—extending their capabilities beyond what’s in their training data.
 
@@ -241,9 +231,6 @@ When this tool is registered, FastMCP automatically:
 The way you define your Python function dictates how the tool appears and behaves for the LLM client.
 
 >Functions with `*args` or `**kwargs` are not supported as tools. This restriction exists because FastMCP needs to generate a complete parameter schema for the MCP protocol, which isn’t possible with variable argument lists.
-
-
-
 
 
 
