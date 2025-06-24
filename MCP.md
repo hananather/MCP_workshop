@@ -296,7 +296,6 @@ def get_repo_info(owner: str, repo: str) -> dict:
 They provide data but shouldn’t perfrom significant computation or have side effects. For examples, the resource can be a list of folders within a directory or the content of a file within a folder. 
 
 
-
 ### Prompt Template
 
 Server can also provide a prompt template. Prompts are reusable message templates that help LLMs generate structured, purposeful responses. FastMCP simplifies defining these templates, primarily using the `@mcp.prompt` decorator.
@@ -330,9 +329,15 @@ def generate_code_request(language: str, task_description: str) -> PromptMessage
     """Generates a user message requesting code generation."""
     content = f"Write a {language} function that performs the following task: {task_description}"
     return PromptMessage(role="user", content=TextContent(type="text", text=content))
+```
 Key Concepts:
 
 - **Name**: By default, the prompt name is taken from the function name.
 - **Parameters**: The function parameters define the inputs needed to generate the prompt.
 - **Inferred Metadata**: By default:
     - **Prompt Name**: Taken from the function name (ask_about_topic).
+
+![alt text](/diagrams/mcp-6.png)
+Composability and the layered approach means of these can be agents. The reason for protocol capabilities resource notifications, server to client communication, the server requesting more information from the client that are built into the MCP protocol itself so that each of these interactions are more powerful than just data passing between different nodes.
+
+Let’s say each of these are agents, the first agent can ask the next agent for a specific set of data, does asynchronous work, talks to the real world, brings it back and sends that back to the first client, which might be multi-step, it might take multiple interactions between each of those two nodes. That’s a more complex interaction that’s captured within the MCP protocol that might not be captured if it were just regular HTTP servers.
