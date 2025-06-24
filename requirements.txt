@@ -1,0 +1,36 @@
+# Core Jupyter packages
+jupyter==1.0.0
+notebook==7.0.6
+jupyterlab==4.0.9
+ipykernel==6.27.1
+
+# MCP SDK (when available)
+# mcp-sdk
+
+# Async support
+asyncio-mqtt==0.16.2
+aiohttp==3.9.1
+
+# Data handling
+pandas==2.1.4
+numpy==1.26.2
+
+# Visualization (for course examples)
+matplotlib==3.8.2
+seaborn==0.13.0
+
+# API and web requests
+requests==2.31.0
+httpx==0.25.2
+
+# Development tools
+python-dotenv==1.0.0
+pydantic==2.5.2
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+
+# Documentation
+sphinx==7.2.6
+myst-parser==2.0.0

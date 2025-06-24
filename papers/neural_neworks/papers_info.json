@@ -1,0 +1,61 @@
+{
+  "1811.02784v1": {
+    "title": "Median Binary-Connect Method and a Binary Convolutional Neural Nework for Word Recognition",
+    "authors": [
+      "Spencer Sheen",
+      "Jiancheng Lyu"
+    ],
+    "summary": "We propose and study a new projection formula for training binary weight\nconvolutional neural networks. The projection formula measures the error in\napproximating a full precision (32 bit) vector by a 1-bit vector in the l_1\nnorm instead of the standard l_2 norm. The l_1 projector is in closed\nanalytical form and involves a median computation instead of an arithmatic\naverage in the l_2 projector. Experiments on 10 keywords classification show\nthat the l_1 (median) BinaryConnect (BC) method outperforms the regular BC,\nregardless of cold or warm start. The binary network trained by median BC and a\nrecent blending technique reaches test accuracy 92.4%, which is 1.1% lower than\nthe full-precision network accuracy 93.5%. On Android phone app, the trained\nbinary network doubles the speed of full-precision network in spoken keywords\nrecognition.",
+    "pdf_url": "http://arxiv.org/pdf/1811.02784v1",
+    "published": "2018-11-07"
+  },
+  "1606.02859v1": {
+    "title": "Maximal switchability of centralized networks",
+    "authors": [
+      "Sergei Vakulenko",
+      "Ivan Morozov",
+      "Ovidiu Radulescu"
+    ],
+    "summary": "We consider continuous time Hopfield-like recurrent networks as dynamical\nmodels for gene regulation and neural networks. We are interested in networks\nthat contain n high-degree nodes preferably connected to a large number of Ns\nweakly connected satellites, a property that we call n/Ns-centrality. If the\nhub dynamics is slow, we obtain that the large time network dynamics is\ncompletely defined by the hub dynamics. Moreover, such networks are maximally\nflexible and switchable, in the sense that they can switch from a globally\nattractive rest state to any structurally stable dynamics when the response\ntime of a special controller hub is changed. In particular, we show that a\ndecrease of the controller hub response time can lead to a sharp variation in\nthe network attractor structure: we can obtain a set of new local attractors,\nwhose number can increase exponentially with N, the total number of nodes of\nthe nework. These new attractors can be periodic or even chaotic. We provide an\nalgorithm, which allows us to design networks with the desired switching\nproperties, or to learn them from time series, by adjusting the interactions\nbetween hubs and satellites. Such switchable networks could be used as models\nfor context dependent adaptation in functional genetics or as models for\ncognitive functions in neuroscience.",
+    "pdf_url": "http://arxiv.org/pdf/1606.02859v1",
+    "published": "2016-06-09"
+  },
+  "1806.07174v3": {
+    "title": "FRnet-DTI: Deep Convolutional Neural Networks with Evolutionary and Structural Features for Drug-Target Interaction",
+    "authors": [
+      "Farshid Rayhan",
+      "Sajid Ahmed",
+      "Zaynab Mousavian",
+      "Dewan Md Farid",
+      "Swakkhar Shatabda"
+    ],
+    "summary": "The task of drug-target interaction prediction holds significant importance\nin pharmacology and therapeutic drug design. In this paper, we present\nFRnet-DTI, an auto encoder and a convolutional classifier for feature\nmanipulation and drug target interaction prediction. Two convolutional neural\nneworks are proposed where one model is used for feature manipulation and the\nother one for classification. Using the first method FRnet-1, we generate 4096\nfeatures for each of the instances in each of the datasets and use the second\nmethod, FRnet-2, to identify interaction probability employing those features.\nWe have tested our method on four gold standard datasets exhaustively used by\nother researchers. Experimental results shows that our method significantly\nimproves over the state-of-the-art method on three of the four drug-target\ninteraction gold standard datasets on both area under curve for Receiver\nOperating Characteristic(auROC) and area under Precision Recall curve(auPR)\nmetric. We also introduce twenty new potential drug-target pairs for\ninteraction based on high prediction scores. Codes Available: https: // github.\ncom/ farshidrayhanuiu/ FRnet-DTI/ Web Implementation: http: // farshidrayhan.\npythonanywhere. com/ FRnet-DTI/",
+    "pdf_url": "http://arxiv.org/pdf/1806.07174v3",
+    "published": "2018-06-19"
+  },
+  "0711.2163v1": {
+    "title": "Predicting spectral features in galaxy spectra from broad-band photometry",
+    "authors": [
+      "F. B. Abdalla",
+      "A. Mateus",
+      "W. A. Santos",
+      "L. Sodre Jr",
+      "I. Ferreras",
+      "O. Lahav"
+    ],
+    "summary": "We explore the prospects of predicting emission line features present in\ngalaxy spectra given broad-band photometry alone. There is a general consent\nthat colours, and spectral features, most notably the 4000 A break, can predict\nmany properties of galaxies, including star formation rates and hence they\ncould infer some of the line properties. We argue that these techniques have\ngreat prospects in helping us understand line emission in extragalactic objects\nand might speed up future galaxy redshift surveys if they are to target\nemission line objects only. We use two independent methods, Artifical Neural\nNeworks (based on the ANNz code) and Locally Weighted Regression (LWR), to\nretrieve correlations present in the colour N-dimensional space and to predict\nthe equivalent widths present in the corresponding spectra. We also investigate\nhow well it is possible to separate galaxies with and without lines from broad\nband photometry only. We find, unsurprisingly, that recombination lines can be\nwell predicted by galaxy colours. However, among collisional lines some can and\nsome cannot be predicted well from galaxy colours alone, without any further\nredshift information. We also use our techniques to estimate how much\ninformation contained in spectral diagnostic diagrams can be recovered from\nbroad-band photometry alone. We find that it is possible to classify AGN and\nstar formation objects relatively well using colours only. We suggest that this\ntechnique could be used to considerably improve redshift surveys such as the\nupcoming FMOS survey and the planned WFMOS survey.",
+    "pdf_url": "http://arxiv.org/pdf/0711.2163v1",
+    "published": "2007-11-14"
+  },
+  "2003.12625v1": {
+    "title": "On the Evaluation of Prohibited Item Classification and Detection in Volumetric 3D Computed Tomography Baggage Security Screening Imagery",
+    "authors": [
+      "Qian Wang",
+      "Neelanjan Bhowmik",
+      "Toby P. Breckon"
+    ],
+    "summary": "X-ray Computed Tomography (CT) based 3D imaging is widely used in airports\nfor aviation security screening whilst prior work on prohibited item detection\nfocuses primarily on 2D X-ray imagery. In this paper, we aim to evaluate the\npossibility of extending the automatic prohibited item detection from 2D X-ray\nimagery to volumetric 3D CT baggage security screening imagery. To these ends,\nwe take advantage of 3D Convolutional Neural Neworks (CNN) and popular object\ndetection frameworks such as RetinaNet and Faster R-CNN in our work. As the\nfirst attempt to use 3D CNN for volumetric 3D CT baggage security screening, we\nfirst evaluate different CNN architectures on the classification of isolated\nprohibited item volumes and compare against traditional methods which use\nhand-crafted features. Subsequently, we evaluate object detection performance\nof different architectures on volumetric 3D CT baggage images. The results of\nour experiments on Bottle and Handgun datasets demonstrate that 3D CNN models\ncan achieve comparable performance (98% true positive rate and 1.5% false\npositive rate) to traditional methods but require significantly less time for\ninference (0.014s per volume). Furthermore, the extended 3D object detection\nmodels achieve promising performance in detecting prohibited items within\nvolumetric 3D CT baggage imagery with 76% mAP for bottles and 88% mAP for\nhandguns, which shows both the challenge and promise of such threat detection\nwithin 3D CT X-ray security imagery.",
+    "pdf_url": "http://arxiv.org/pdf/2003.12625v1",
+    "published": "2020-03-27"
+  }
+}
