@@ -47,11 +47,13 @@ Everything that can be done with MCP can technically be done without it. MCP doe
 ### Core Primitives
 ![alt text](/diagrams/mcp-5.png)
 
+**Tools** are functions that LLMs can call. They are the core building blocks that allow our LLM to interact with external systems, execute code, and access data that isn’t training data.
 
-- **Tools** are functions that LLMs can call. They are the core building blocks that allow our LLM to interact with external systems, execute code, and access data that isn’t training data.
-- **Resources** are read-only data that an MCP server can expose to the LLM application. Resources are similar to GET endpoint request in a Rest API. They provide data but shouldn’t perform significant computation or have side effects. For examples, the resource can be a list of folders within a directory or the content of a file within a folder.
-- **Prompts** are reusable templates for LLM interactions.
 
+
+**Resources** are read-only data that an MCP server can expose to the LLM application. Resources are similar to GET endpoint request in a Rest API. They provide data but shouldn’t perform significant computation or have side effects. For examples, the resource can be a list of folders within a directory or the content of a file within a folder.
+
+**Prompts** are reusable templates for LLM interactions.
 
 
 
@@ -251,8 +253,90 @@ The way you define your Python function dictates how the tool appears and behave
 
 ### Resources
 
-Resources are read-only dat that an MCP server can expose to the LLM application. Resources are similar to GER endpoint request in a Rest API. They provide data but shouldn’t perfrom significant computation or have side effects. For examples, the resource can be a list of folders within a directory or the content of a file within a folder. Here, the MCP server provides
+Resources are read-only data that an MCP server can expose to the LLM application. Resources are similar to GET endpoint request in a Rest API. 
+When a client requests a resource URI:
+1. FastMCP finds the corresponding resource definition.
+2. If it’s dynamic (defined by a function), the function is executed.
+3. The content (text, JSON, binary data) is returned to the client.
+This allows LLMs to access files, database content, configuration, or dynamically generated information relevant to the conversation.
+
+``` python
+from fastmcp import FastMCP
+
+mcp = FastMCP(name="DataServer")
+
+# Template URI includes {city} placeholder
+@mcp.resource("weather://{city}/current")
+def get_weather(city: str) -> dict:
+    """Provides weather information for a specific city."""
+    # In a real implementation, this would call a weather API
+    # Here we're using simplified logic for example purposes
+    return {
+        "city": city.capitalize(),
+        "temperature": 22,
+        "condition": "Sunny",
+        "unit": "celsius"
+    }
+
+# Template with multiple parameters
+@mcp.resource("repos://{owner}/{repo}/info")
+def get_repo_info(owner: str, repo: str) -> dict:
+    """Retrieves information about a GitHub repository."""
+    # In a real implementation, this would call the GitHub API
+    return {
+        "owner": owner,
+        "name": repo,
+        "full_name": f"{owner}/{repo}",
+        "stars": 120,
+        "forks": 48
+    }
+```
+
+They provide data but shouldn’t perfrom significant computation or have side effects. For examples, the resource can be a list of folders within a directory or the content of a file within a folder. 
+
+
+
+
+
+
+
 
 ### Prompt Template
 
-Server can also provide a prompt template. You can define this feature in the MCP server using the decorator `@mcp.prompt()` a g
+Server can also provide a prompt template. Prompts are reusable message templates that help LLMs generate structured, purposeful responses. FastMCP simplifies defining these templates, primarily using the `@mcp.prompt` decorator.
+
+Prompts provide parameterized message templates for LLMs. When a client requests a prompt:
+
+1. FastMCP finds the corresponding prompt definition.
+2. If it has parameters, they are validated against the function signature.
+3. The function executes with the validated inputs.
+4. The generated message(s) are returned to the LLM to guide its response.
+
+This allows us to define consistent, reusable templates that LLMs can use across different clients and contexts.
+
+The most common way to define a prompt is by decorating a Python function. The decorator uses the function name as the prompt’s identifier.
+
+``` python
+from fastmcp import FastMCP
+from fastmcp.prompts.prompt import Message, PromptMessage, TextContent
+
+mcp = FastMCP(name="PromptServer")
+
+# Basic prompt returning a string (converted to user message automatically)
+@mcp.prompt
+def ask_about_topic(topic: str) -> str:
+    """Generates a user message asking for an explanation of a topic."""
+    return f"Can you please explain the concept of '{topic}'?"
+
+# Prompt returning a specific message type
+@mcp.prompt
+def generate_code_request(language: str, task_description: str) -> PromptMessage:
+    """Generates a user message requesting code generation."""
+    content = f"Write a {language} function that performs the following task: {task_description}"
+    return PromptMessage(role="user", content=TextContent(type="text", text=content))
+Key Concepts:
+
+- **Name**: By default, the prompt name is taken from the function name.
+- **Parameters**: The function parameters define the inputs needed to generate the prompt.
+- **Inferred Metadata**: By default:
+    - **Prompt Name**: Taken from the function name (ask_about_topic).
