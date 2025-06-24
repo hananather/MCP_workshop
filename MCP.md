@@ -47,13 +47,20 @@ Everything that can be done with MCP can technically be done without it. MCP doe
 ### Core Primitives
 ![alt text](/diagrams/mcp-5.png)
 
-**Tools** are functions that LLMs can call. They are the core building blocks that allow our LLM to interact with external systems, execute code, and access data that isn’t training data.
+**Tools**  are functions that the LLM can ask the server to execute. They are the action-oriented part of MCP. Analogos to REST, you can think of Tools as being like `POST` requests. They are used to perform an action, change state, or trigger a side effect, like sending an email, adding a user to a database, or making a calculation.
 
 
+**Resources** are read-only data that an MCP server can expose to the LLM application. They are used to load information into the LLM’s context, providing it with knowledge it doesn’t have from its training data. Resources are similar to GET endpoint request in a Rest API. Their purpose is to retrieve information idempotently, ideally without causing side effects. A resource can be anything from a static text file to a dynamic piece of data from a database. Each resource is identified by a unique URI. 
+    - We can also create Resource Templates for dynamic data. A client could request users://42/profile to get the profile for a specific user.
 
-**Resources** are read-only data that an MCP server can expose to the LLM application. Resources are similar to GET endpoint request in a Rest API. They provide data but shouldn’t perform significant computation or have side effects. For examples, the resource can be a list of folders within a directory or the content of a file within a folder.
+**Prompts** Prompts are reusable, parameterized message templates. They provide a way to define consistent, structured instructions that a client can request to guide the LLM’s behavior for a specific task.
 
-**Prompts** are reusable templates for LLM interactions.
+
+### Advanced Capabilities
+- **Notifications**: One valuable feature is resource notifications. The client can subscribe to a resource, and anytime the server updates it with new info, the server pushes a notification to the client—telling it to update system state or surface new information to the user.
+
+![alt text](/diagrams/sampling.png)
+**Sampling**: The client can request a sample of the data from the server. This is useful for large datasets or when the client wants to see a preview of the data before making a decision.
 
 
 
@@ -75,9 +82,6 @@ The right way to frame this is that MCP creates different kinds of value for dif
 - For enterprises, MCP introduces a clean way to separate concerns. Say one team owns the data layer and another team is building AI products. In the pre-MCP world, every team would implement its own access method, including prompt logic and chunking to get the data they need and process into their AI application. With MCP, that data team builds and maintains a single MCP server. They publish the interface, document it, and every other team can plug into it. Teams move faster, and the organization operates more like a modern microservices architecture—each team owns their piece, and the whole roadmap accelerates.
 
 
-
-
-
 **Who authors the MCP server?**
 - You can build them yourself or use community ones. You can make a MCP server to wrap up access to some servince. Often the service provider itself will make their own MCP server implementation. We'll build our own.
 
@@ -86,9 +90,6 @@ The right way to frame this is that MCP creates different kinds of value for dif
 
 **What's the difference between MCP servers and tool/function calling?**
 - MCP servers support tool use, but that's just one part. MCP servers provide tool plus schema + functions already defined for you. We will explore this in detail in the rest of this post.
-
-
-
 
 
 ## How can you create an MCP server?
@@ -293,11 +294,6 @@ def get_repo_info(owner: str, repo: str) -> dict:
 ```
 
 They provide data but shouldn’t perfrom significant computation or have side effects. For examples, the resource can be a list of folders within a directory or the content of a file within a folder. 
-
-
-
-
-
 
 
 
