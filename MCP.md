@@ -20,6 +20,88 @@ It may be easier to think of it as an API, but specifically designed for LLM int
 
 
 
+Since models are only as good as the context provided to them. You can have an incredibly intelligent model at the frontier, but if it doesn't have the ability to connect to the outside world and pull in necessary data and context, it's not as useful as it can possibly be.
+
+MCP helps build agents and complex workflows on top of LLMs. LLMs frequently need to intergrate with data and tools, and MCP provides:
+- Pre-buillt intergrations that our LLM/AI application can plug into
+- Flexibility swtich between differnt LLM providers and AI applications
+- Best practices for securing your data within your infrastructure
+
+
+
+
+
+### General Architecture
+
+- **MCP hosts** are IDEs or AI tools (RooCode, GitHub Co-pilot, Claude Desktop)
+  - [https://modelcontextprotocol.io/clients](https://modelcontextprotocol.io/clients)
+- **MCP clients (protocol clients)** that maintain 1:1 connection with servers
+- **MCP servers**: Light weight programs that each expose specific capabilities through MCP
+- **Local data sources** like your computers’s files, databases, and servinces that MCP servers can securely access
+- **Remote services** are exteral systems availble over the internet (e.g., through APIs) that MCP servers can connect
+
+![alt text](/diagrams/mcp-2.png)
+
+Everything that can be done with MCP can technically be done without it. MCP doesn't reinvent the wheel for things like tool use. It just aims to standardize how AI applications interact with external systems. This is why other AI competitors to Anthropic like OpenAI and Google have adopted MCP. An analogy I would use is it's like how web applications communicate with backends and other systems using REST, where you have a specified protocol, statelessness, and so on. MCP standardizes how AI applications interact with external systems. Instead of building the same integration for different data sources over and over again depending on the model or the data source, you build once and use everywhere.
+
+### Core Primitives
+![alt text](/diagrams/mcp-5.png)
+
+
+- **Tools** are functions that LLMs can call. They are the core building blocks that allow our LLM to interact with external systems, execute code, and access data that isn’t training data.
+- **Resources** are read-only data that an MCP server can expose to the LLM application. Resources are similar to GET endpoint request in a Rest API. They provide data but shouldn’t perform significant computation or have side effects. For examples, the resource can be a list of folders within a directory or the content of a file within a folder.
+- **Prompts** are reusable templates for LLM interactions.
+
+
+
+
+
+### Key Takeaways
+
+MCP shifts the burden and separates concerns cleanly. Build an MCP app and connect it to servers for whatever data you need. Want data from AWS? There's a server. Need Git access? There's a server. The goal is simple: use natural language to talk to data stores without writing all that logic.
+![alt text](/diagrams/mcp-3.png)
+The beauty is that these servers are reusable. An MCP server for Google Drive works with any MCP app you build. AI assistant, agent, desktop app. If it speaks MCP, it can use that server. Let your imagination run with all the data access you can bring to your application with minimal code.
+
+![alt text](/diagrams/mcp-4.png)
+
+The right way to frame this is that MCP creates different kinds of value for different people. There are four main buckets:
+
+-For application developers, once your client is MCP-compatible, you can connect it to any server with zero extra work. 
+- If you’re a tool or API provider—or anyone who wants to give LLMs access to relevant data—you build your MCP server once and instantly get adoption across a range of AI applications.
+- For end users, this unlocks richer, more powerful AI systems. You’ve probably seen demos—whether it’s Cursor, WindSurf, or even our own first-party apps—where these systems have deep context, know things about you, and can act on your behalf in the real world.
+- For end users, this unlocks richer, more powerful AI systems. You’ve probably seen demos—whether it’s Co-pilot, RooCode etc. these systems have deep context, know things about you, and can act on your behalf in the real world.
+- For enterprises, MCP introduces a clean way to separate concerns. Say one team owns the data layer and another team is building AI products. In the pre-MCP world, every team would implement its own access method, including prompt logic and chunking to get the data they need and process into their AI application. With MCP, that data team builds and maintains a single MCP server. They publish the interface, document it, and every other team can plug into it. Teams move faster, and the organization operates more like a modern microservices architecture—each team owns their piece, and the whole roadmap accelerates.
+
+
+
+
+
+**Who authors the MCP server?**
+- You can build them yourself or use community ones. You can make a MCP server to wrap up access to some servince. Often the service provider itself will make their own MCP server implementation. We'll build our own.
+
+**How is using MCP Server different from just calling a service’s API direclty?**
+- You might be thinking MCP servers are just like APIs. You're not wrong. An analogy I would use is: MCP server as a gateway on top of an API. MCP servers provde tool schemas + functons. If you want to direclty call an API, you’ll be authoring those on your own (clarify using an example)
+
+**What's the difference between MCP servers and tool/function calling?**
+- MCP servers support tool use, but that's just one part. MCP servers provide tool plus schema + functions already defined for you. We will explore this in detail in the rest of this post.
+
+
+
+
+
+## How can you create an MCP server?
+
+Lets take the example of a server that exposes tools. This server needs to handle two main requests from clients clients:
+- listing all the tools
+- executing a particular tool with these arguments
+
+There are two ways of creating an MCP server:
+- Low level implementation: in this approach, we can direclty define and handle the various types of request (`ListToolsRequest`  and `CallToolRequest`). This approach allows you to customize every aspect of your sever
+- High-level implementation using `FastMCP` : `FastMCP` is a high-level interface that makes building MCP servers faster and simpler. In this approach, you just focus on defining the tools are functions, and `FastMCP` handles all the protocol details
+
+To create an MCP server using FastMCP, we initialize a `FastMCP` server labled `mcp` and decorating the functions with `@mcp.tools()` . `FastMCP` automatically generates the necessary schema based on type hints and docstrings
+
+
 
 ### Introductory Example
 
@@ -112,9 +194,6 @@ async with client:
 ```
 
 
-
-
-
 ### Key Takeaways:
 - We have successfully equipped our LLM with a new capability (a greeting tool.)
 This demonstrates the fundamental power of MCP: **turning any function into a tool that an LLM can use.**
@@ -131,70 +210,6 @@ This simple example demonstrates that MCP isn't just about connecting to externa
 
 
 ---
-
-
-Since models are only as good as the context provided to them. You can have an incredibly intelligent model at the frontier, but if it doesn't have the ability to connect to the outside world and pull in necessary data and context, it's not as useful as it can possibly be.
-
-MCP helps build agents and complex workflows on top of LLMs. LLMs frequently need to intergrate with data and tools, and MCP provides:
-- Pre-buillt intergrations that our LLM/AI application can plug into
-- Flexibility swtich between differnt LLM providers and AI applications
-- Best practices for securing your data within your infrastructure
-
-
-
-
-
-### General Architecture
-
-- **MCP hosts** are IDEs or AI tools (RooCode, GitHub Co-pilot, Claude Desktop)
-  - [https://modelcontextprotocol.io/clients](https://modelcontextprotocol.io/clients)
-- MCP clients (protocol clients) that maintain 1:1 connection with servers
-- MCP servers: Light weight programs that each expose specific capabilities through MCP
-- Local data sources like your computers’s files, databases, and servinces that MCP servers can securely access
-- Remote services are exteral systems availble over the internet (e.g., through APIs) that MCP servers can connect
-
-
-Everything that can be done with MCP can technically be done without it. MCP doesn't reinvent the wheel for things like tool use. It just aims to standardize how AI applications interact with external systems. This is why other AI competitors to Anthropic like OpenAI and Google have adopted MCP. An analogy I would use is it's like how web applications communicate with backends and other systems using REST, where you have a specified protocol, statelessness, and so on. MCP standardizes how AI applications interact with external systems. Instead of building the same integration for different data sources over and over again depending on the model or the data source, you build once and use everywhere.
-
-MCP shifts the burden and separates concerns cleanly. Build an MCP app and connect it to servers for whatever data you need. Want data from AWS? There's a server. Need Git access? There's a server. The goal is simple: use natural language to talk to data stores without writing all that logic.
-
-The beauty is that these servers are reusable. An MCP server for Google Drive works with any MCP app you build. AI assistant, agent, desktop app. If it speaks MCP, it can use that server. Let your imagination run with all the data access you can bring to your application with minimal code.
-![alt text](/diagrams/mcp-3.png)
-**Who wins with MCP?**
-- App developers: Connect with minimal code
-- API developers: Build once, adopt everywhere
-- Users: Just bring a URL, get your data
-- Enterprises: Separate concerns, let teams build independently
-
-## Who authors the MCP server?
-
-You can build them yourself or use community ones. You can make a MCP server to wrap up access to some servince. Often the service provider itself will make their own MCP server implementation. We'll build our own.
-
-## How is using MCP Server different from just calling a service’s API direclty?
-
-You might be thinking MCP servers are just like APIs. You're not wrong. An analogy I would use is: MCP server as a gateway on top of an API. MCP servers provde tool schemas + functons. If you want to direclty call an API, you’ll be authoring those on your own (clarify using an example)
-
-## What's the difference between MCP servers and tool/function calling?
-
-MCP servers support tool use, but that's just one part. MCP servers provide tool plus schema + functions already defined for you. We will explore this in detail in the rest of this post.
-
-The main takeaways for now is: Why use MCP? Because it works with minimal effort.
-![alt text](/diagrams/mcp-2.png)
----
-
-## How can you create an MCP server?
-
-Lets take the example of a server that exposes tools. This server needs to handle two main requests from clients clients:
-- listing all the tools
-- executing a particular tool with these arguments
-
-There are two ways of creating an MCP server:
-- Low level implementation: in this approach, we can direclty define and handle the various types of request (`ListToolsReques`  and `CallToolRequst`). This approach allows you to customize every aspect of your sever
-- High-level implementation using `FastMCP` : `FastMCP` is a high-level interface that makes building MCP servers faster and simpler. In this approach, you just focus on defining the tools are functions, and `FastMCP` handles all the protocol details
-
----
-
-To create an MCP server using FastMCP, we initialize a `FastMCP` server labled `mcp` and decorating the functions with `@mcp.tools()` . `FastMCP` automatically generates the necessary schema based on type hints and docstrings
 
 ### Tools
 
