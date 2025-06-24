@@ -1,5 +1,7 @@
 # Model Context Protocol
+Author: Hanan Ather
 
+---
 The Model Context Protocol is an open source protocol that standardizes how applications provide context to LLMs.
 The motivation behind MCP is that models are only as good as the context we provide. This seems obvious now, but a year ago, when most AI applications were chatbots, you’d bring in context by copy-pasting or typing from other systems. Over the past year, we’ve seen these evolve into systems where the model has hooks into data and context, making it more powerful and personalized.
 
